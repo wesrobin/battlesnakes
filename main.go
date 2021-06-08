@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/wesrobin/battlesnakes/api"
 	"log"
 	"net/http"
 	"os"
@@ -14,10 +13,10 @@ func main() {
 		port = "8080"
 	}
 
-	http.HandleFunc("/", api.HandleIndex)
-	http.HandleFunc("/start", api.HandleStart)
-	http.HandleFunc("/move", api.HandleMove)
-	http.HandleFunc("/end", api.HandleEnd)
+	http.HandleFunc("/", HandleIndex)
+	http.HandleFunc("/start", HandleStart)
+	http.HandleFunc("/move", HandleMove)
+	http.HandleFunc("/end", HandleEnd)
 
 	fmt.Printf("Starting Battlesnake Server at http://0.0.0.0:%s...\n", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

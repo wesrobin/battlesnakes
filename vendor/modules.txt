@@ -1,0 +1,2 @@
+# github.com/BattlesnakeOfficial/rules v1.0.17
+## explicit

@@ -5,6 +5,13 @@ type Game struct {
 	Timeout int32  `json:"timeout"`
 }
 
+type Board struct {
+	Height int           `json:"height"`
+	Width  int           `json:"width"`
+	Food   []Coord       `json:"food"`
+	Snakes []Battlesnake `json:"snakes"`
+}
+
 type Coord struct {
 	X int `json:"x"`
 	Y int `json:"y"`
@@ -20,9 +27,17 @@ type Battlesnake struct {
 	Shout  string  `json:"shout"`
 }
 
-type Board struct {
-	Height int           `json:"height"`
-	Width  int           `json:"width"`
-	Food   []Coord       `json:"food"`
-	Snakes []Battlesnake `json:"snakes"`
+type Move int
+
+var (
+	Up Move = 0
+	Down Move = 1
+	Left Move = 2
+	Right Move = 3
+)
+
+func (m Move) String() string {
+	return []string{"up", "down", "left", "right"}[m]
 }
+
+var PossibleMoves = []Move{Up, Down, Left, Right}

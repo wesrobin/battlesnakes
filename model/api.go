@@ -1,6 +1,4 @@
-package api
-
-import "github.com/wesrobin/battlesnakes/model"
+package model
 
 type BattlesnakeInfoResponse struct {
 	APIVersion string `json:"apiversion"`
@@ -11,10 +9,10 @@ type BattlesnakeInfoResponse struct {
 }
 
 type GameRequest struct {
-	Game  model.Game        `json:"game"`
-	Turn  int               `json:"turn"`
-	Board model.Board       `json:"board"`
-	You   model.Battlesnake `json:"you"`
+	Game  Game        `json:"game"`
+	Turn  int         `json:"turn"`
+	Board Board       `json:"board"`
+	You   Battlesnake `json:"you"`
 }
 
 type MoveResponse struct {
