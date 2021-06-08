@@ -1,7 +1,24 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/wesrobin/battlesnakes/api"
+	"log"
+	"net/http"
+	"os"
+)
 
 func main() {
-	fmt.Println("Hello World!")
+	port := os.Getenv("PORT")
+	if len(port) == 0 {
+		port = "8080"
+	}
+
+	http.HandleFunc("/", api.HandleIndex)
+	http.HandleFunc("/start", api.HandleStart)
+	http.HandleFunc("/move", api.HandleMove)
+	http.HandleFunc("/end", api.HandleEnd)
+
+	fmt.Printf("Starting Battlesnake Server at http://0.0.0.0:%s...\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
