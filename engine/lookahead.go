@@ -19,15 +19,16 @@ func bfs(board model.Board) model.Move {
 	possMvs := getPossibleMoves(board)
 	moveScores := make(map[model.Move]int)
 	for _, mv := range possMvs {
+		mv := mv
 		d := bfsUtil(board, mv, searchDepth)
 		moveScores[mv] = d
 	}
 
-	max := -1
+	min := searchDepth + 1
 	var finalMove model.Move
 	for mv, d := range moveScores {
-		if d > max {
-			max = d
+		if d < min {
+			min = d
 			finalMove = mv
 		}
 	}
