@@ -39,11 +39,13 @@ func bfsUtil(board model.Board, mv model.Move, d int) int {
 	if d == 0 {
 		return 0
 	}
-	board = step(board, mv)
+	//printMap(board)
+	b2 := step(board, mv)
+	//printMap(b2)
 	mvs := getPossibleMoves(board)
 	if len(mvs) == 0 {
 		return d
 	}
-	return bfsUtil(board, mvs[rand.Intn(len(mvs))], d) // FIXME: Don't just move randomly
+	return bfsUtil(b2, mvs[rand.Intn(len(mvs))], d) // FIXME: Don't just move randomly
 }
 

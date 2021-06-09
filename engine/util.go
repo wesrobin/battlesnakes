@@ -1,6 +1,11 @@
 package engine
 
-import "github.com/wesrobin/battlesnakes/model"
+import (
+	"bytes"
+	"fmt"
+	"github.com/wesrobin/battlesnakes/model"
+	"log"
+)
 
 func getCoordAfterMove(coord model.Coord, move model.Move) model.Coord {
 	switch move {
@@ -41,6 +46,8 @@ func legalCoord(state model.Board, coord model.Coord) bool {
 
 // Pls only call with legal moves <3
 func step(board model.Board, mv model.Move) model.Board {
+	mvS := model.PossibleMoves[mv]
+	fmt.Println(mvS)
 	snek := board.Snakes[0]
 	newHead := getCoordAfterMove(snek.Head, mv)
 
@@ -63,6 +70,8 @@ func step(board model.Board, mv model.Move) model.Board {
 		newBod[len(newBod)-1] = snek.Body[len(snek.Body)-1]
 	}
 	snek.Body = newBod
+	snek.Head = newHead
+	board.Snakes[0] = snek
 	return board
 }
 
@@ -75,4 +84,37 @@ func getPossibleMoves(board model.Board) []model.Move {
 		}
 	}
 	return pMvs
+}
+
+func printMap(state model.Board) {
+	var o bytes.Buffer
+	board := make([][]rune, state.Width)
+	for i := range board {
+		board[i] = make([]rune, state.Height)
+	}
+	for y := 0; y < state.Height; y++ {
+		for x := 0; x < state.Width; x++ {
+			board[x][y] = '◦'
+		}
+	}
+	for _, f := range state.Food {
+		board[f.X][f.Y] = '⚕'
+	}
+	for _, s := range state.Snakes {
+		for i, b := range s.Body {
+			if i == 0 {
+				board[b.X][b.Y] = 'X'
+			} else {
+				board[b.X][b.Y] = 'O'
+			}
+		}
+	}
+	o.WriteRune('\n')
+	for y := state.Height - 1; y >= 0; y-- {
+		for x := 0; x < state.Width; x++ {
+			o.WriteRune(board[x][y])
+		}
+		o.WriteString("\n")
+	}
+	log.Println(o.String())
 }
