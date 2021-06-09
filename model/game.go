@@ -30,14 +30,15 @@ type Battlesnake struct {
 type Move int
 
 var (
-	Up Move = 0
-	Down Move = 1
-	Left Move = 2
+	Up    Move = 0
+	Down  Move = 1
+	Left  Move = 2
 	Right Move = 3
 )
 
-func (m Move) String() string {
-	return []string{"up", "down", "left", "right"}[m]
+var PossibleMoves = map[Move]string{
+	Up:"up",
+	Down: "down",
+	Left: "left",
+	Right: "right",
 }
-
-var PossibleMoves = []Move{Up, Down, Left, Right}

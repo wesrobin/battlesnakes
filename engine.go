@@ -8,14 +8,14 @@ import (
 
 func getMove(state model.Board) string {
 	// Choose a random direction to move in
-	for _, move := range model.PossibleMoves {
+	for move, moveS := range model.PossibleMoves {
 		coord := getCoordAfterMove(state.Snakes[0].Head, move)
 		if legalCoord(state, coord) {
-			fmt.Printf("Chose move: %s to coord: (%d,%d)\n", move, coord.X, coord.Y)
-			return move.String()
+			fmt.Printf("Chose move: %s to coord: (%d,%d)\n", moveS, coord.X, coord.Y)
+			return moveS
 		}
 	}
-	move := model.PossibleMoves[rand.Intn(len(model.PossibleMoves))].String()
+	move := model.PossibleMoves[model.Move(rand.Intn(len(model.PossibleMoves)))]
 	fmt.Printf("Chose move at random: %s\n", move)
 	// Just return random move lol
 	return move
