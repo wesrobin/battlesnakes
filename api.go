@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/wesrobin/battlesnakes/engine"
 	"github.com/wesrobin/battlesnakes/model"
 	"log"
 	"net/http"
@@ -53,7 +54,7 @@ func HandleMove(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := model.MoveResponse{
-		Move: getMove(request.Board),
+		Move: engine.GetMove(request.Board),
 	}
 
 	fmt.Printf("MOVE: %s\n", response.Move)
