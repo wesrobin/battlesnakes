@@ -4,10 +4,12 @@ import (
 	"github.com/wesrobin/battlesnakes/model"
 )
 
+var la = Lookahead{} // Store some state
+
 func GetMove(state model.Board) string {
 	s := state
 	printMap(s)
-	move := getLookaheadMove(s)
+	move := la.getLookaheadMove(s)
 
 	// --- Base case ---
 	//// Choose a random direction to move in

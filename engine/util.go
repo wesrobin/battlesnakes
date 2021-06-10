@@ -44,19 +44,22 @@ func legalCoord(state model.Board, coord model.Coord) bool {
 }
 
 // Pls only call with legal moves <3
-func step(board model.Board, mv model.Move) model.Board {
+func step(b model.Board, mv model.Move) model.Board {
+	board := deepCopy(b)
 	snek := board.Snakes[0]
 	snek.Health--
 	newHead := getCoordAfterMove(snek.Head, mv)
 
 	l := len(snek.Body)
 	var hazCheez bool
-	for _, cheezes := range board.Food {
+	for i, cheezes := range board.Food {
 		if newHead == cheezes {
 			hazCheez = true
 			snek.Length++
 			snek.Health = 100
 			l++
+
+			board.Food = append(board.Food[:i], board.Food[i+1:]...)
 			break
 		}
 	}
@@ -73,6 +76,16 @@ func step(board model.Board, mv model.Move) model.Board {
 	snek.Head = newHead
 	board.Snakes[0] = snek
 	return board
+}
+
+func deepCopy(board model.Board) model.Board {
+	b := model.Board{
+		Height: board.Height,
+		Width:  board.Width,
+	}
+	b.Snakes = append(b.Snakes, board.Snakes...)
+	b.Food = append(b.Food, board.Food...)
+	return b
 }
 
 func getPossibleMoves(board model.Board) []model.Move {
