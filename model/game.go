@@ -1,5 +1,10 @@
 package model
 
+import (
+	"crypto/sha256"
+	"fmt"
+)
+
 type Game struct {
 	ID      string `json:"id"`
 	Timeout int32  `json:"timeout"`
@@ -10,6 +15,13 @@ type Board struct {
 	Width  int           `json:"width"`
 	Food   []Coord       `json:"food"`
 	Snakes []Battlesnake `json:"snakes"`
+}
+
+func (b Board) Hash() string {
+	h := sha256.New()
+	h.Write([]byte(fmt.Sprintf("%v", b)))
+
+	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
 type Coord struct {

@@ -14,11 +14,6 @@ type Lookahead struct {
 	cache sync.Map
 }
 
-type key struct {
-	model.Board
-	model.Move
-}
-
 const searchDepth = 10
 
 func (la *Lookahead) getLookaheadMove(board model.Board) model.Move {
@@ -53,7 +48,7 @@ func (la *Lookahead) dfs(board model.Board) model.Move {
 }
 
 func makeKey(board model.Board, move model.Move) string {
-	return fmt.Sprintf("%v:%v", board, move)
+	return fmt.Sprintf("%v:%v", board.Hash(), move)
 }
 
 func (la *Lookahead) bfsUtil(board *model.Board, mv model.Move, d int) int {

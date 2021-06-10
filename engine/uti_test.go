@@ -203,6 +203,7 @@ func TestStep(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			actual := step(tc.board, tc.move)
 			assert.DeepEqual(t, tc.expected, actual)
+			assert.Equal(t, tc.expected.Hash(), actual.Hash())
 		})
 	}
 }
