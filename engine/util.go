@@ -46,6 +46,7 @@ func legalCoord(state model.Board, coord model.Coord) bool {
 // Pls only call with legal moves <3
 func step(board model.Board, mv model.Move) model.Board {
 	snek := board.Snakes[0]
+	snek.Health--
 	newHead := getCoordAfterMove(snek.Head, mv)
 
 	l := len(snek.Body)
@@ -53,6 +54,8 @@ func step(board model.Board, mv model.Move) model.Board {
 	for _, cheezes := range board.Food {
 		if newHead == cheezes {
 			hazCheez = true
+			snek.Length++
+			snek.Health = 100
 			l++
 			break
 		}

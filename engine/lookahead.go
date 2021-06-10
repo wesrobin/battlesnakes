@@ -44,9 +44,10 @@ func bfsUtil(board model.Board, mv model.Move, d int) int {
 	if d == searchDepth {
 		return d
 	}
-	//printMap(board)
 	b2 := step(board, mv)
-	//printMap(b2)
+	if b2.Snakes[0].Health == 0 {
+		return d
+	}
 	mvs := getPossibleMoves(board)
 	if len(mvs) == 0 {
 		return d
