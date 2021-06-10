@@ -16,7 +16,7 @@ type Lookahead struct {
 
 const searchDepth = 10
 
-func (la *Lookahead) getLookaheadMove(board model.Board) model.Move {
+func (la *Lookahead) getMove(board model.Board) model.Move {
 	b := board // Don't touch the original
 	return la.dfs(b)
 }
@@ -29,7 +29,7 @@ func (la *Lookahead) dfs(board model.Board) model.Move {
 	for _, mv := range possMvs {
 		board := board
 		mv := mv
-		d := la.bfsUtil(&board, mv, 0)
+		d := la.dfsUtil(&board, mv, 0)
 		moveScores[mv] = d
 		if d == searchDepth {
 			break
@@ -51,7 +51,7 @@ func makeKey(board model.Board, move model.Move) string {
 	return fmt.Sprintf("%v:%v", board.Hash(), move)
 }
 
-func (la *Lookahead) bfsUtil(board *model.Board, mv model.Move, d int) int {
+func (la *Lookahead) dfsUtil(board *model.Board, mv model.Move, d int) int {
 	k := makeKey(*board, mv)
 	if val, ok := la.cache.Load(k); ok {
 		return val.(int)
@@ -71,7 +71,7 @@ func (la *Lookahead) bfsUtil(board *model.Board, mv model.Move, d int) int {
 	max := float64(-1)
 	for _, mv := range mvs {
 		mv := mv
-		d := la.bfsUtil(&b, mv, d)
+		d := la.dfsUtil(&b, mv, d)
 		max = math.Max(max, float64(d))
 	}
 	la.cache.Store(k, d)

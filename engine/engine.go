@@ -9,7 +9,7 @@ var la = Lookahead{} // Store some state
 func GetMove(state model.Board) string {
 	s := state
 	printMap(s)
-	move := la.getLookaheadMove(s)
+	move := la.getMove(s)
 
 	// --- Base case ---
 	//// Choose a random direction to move in
