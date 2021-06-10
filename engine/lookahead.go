@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/wesrobin/battlesnakes/model"
 	"math/rand"
 )
@@ -8,7 +9,7 @@ import (
 // Lookahead strategy plays out each of the three (or less!) available moves to the snake. Whichever lasts longest wins.
 // If neither strategy wins, chooses one at random after `searchDepth` steps
 
-const searchDepth = 10
+const searchDepth = 20
 
 func getLookaheadMove(board model.Board) model.Move {
 	return bfs(board)
@@ -20,15 +21,18 @@ func bfs(board model.Board) model.Move {
 	moveScores := make(map[model.Move]int)
 	for _, mv := range possMvs {
 		mv := mv
-		d := bfsUtil(board, mv, searchDepth)
+		d := bfsUtil(board, mv, 0)
 		moveScores[mv] = d
+		if d < searchDepth {
+			fmt.Println(model.PossibleMoves[mv], " dies")
+		}
 	}
 
-	min := searchDepth + 1
+	max := -1
 	var finalMove model.Move
 	for mv, d := range moveScores {
-		if d < min {
-			min = d
+		if d > max {
+			max = d
 			finalMove = mv
 		}
 	}
@@ -36,9 +40,9 @@ func bfs(board model.Board) model.Move {
 }
 
 func bfsUtil(board model.Board, mv model.Move, d int) int {
-	d--
-	if d == 0 {
-		return 0
+	d++
+	if d == searchDepth {
+		return d
 	}
 	//printMap(board)
 	b2 := step(board, mv)

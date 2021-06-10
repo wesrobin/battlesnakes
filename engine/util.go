@@ -2,7 +2,6 @@ package engine
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/wesrobin/battlesnakes/model"
 	"log"
 )
@@ -46,8 +45,6 @@ func legalCoord(state model.Board, coord model.Coord) bool {
 
 // Pls only call with legal moves <3
 func step(board model.Board, mv model.Move) model.Board {
-	mvS := model.PossibleMoves[mv]
-	fmt.Println(mvS)
 	snek := board.Snakes[0]
 	newHead := getCoordAfterMove(snek.Head, mv)
 

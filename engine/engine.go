@@ -1,12 +1,13 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/wesrobin/battlesnakes/model"
 )
 
 func GetMove(state model.Board) string {
-	move := getLookaheadMove(state)
+	s := state
+	printMap(s)
+	move := getLookaheadMove(s)
 
 	// --- Base case ---
 	//// Choose a random direction to move in
@@ -18,7 +19,7 @@ func GetMove(state model.Board) string {
 	//	}
 	//}
 	//move := model.PossibleMoves[model.Move(rand.Intn(len(model.PossibleMoves)))]
-	fmt.Printf("Chose move: %s\n", model.PossibleMoves[move])
+	//fmt.Printf("Chose move: %s\n", model.PossibleMoves[move])
 	//// Just return random move lol
 	return model.PossibleMoves[move]
 }
