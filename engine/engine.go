@@ -5,14 +5,15 @@ import (
 	"github.com/wesrobin/battlesnakes/model"
 )
 
-var la = Lookahead{}
-var ws = WeightedSniff{}
+type Strategy interface {
+	GetMove(board model.Board) model.Move
+}
 
 func GetMove(board model.Board) string {
 	s := board
 	UpdateState(board)
 	printMap(s)
-	move := ws.getMove(s)
+	move := WeightedSniff{}.GetMove(s)
 	fmt.Println("chose", model.PossibleMoves[move])
 	fmt.Println("*******END*******")
 

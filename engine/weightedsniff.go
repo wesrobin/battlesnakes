@@ -11,12 +11,11 @@ type WeightedSniff struct {
 }
 
 var (
-	// Weights [0,200)
-	myTail  = 20
+	myTail  = 50
 	illegal = 0
 
 	// Misc
-	sniffRadius = 5
+	sniffRadius = 10
 )
 
 type moveWeight struct {
@@ -24,7 +23,8 @@ type moveWeight struct {
 	weight int
 }
 
-func (ws WeightedSniff) getMove(board model.Board) model.Move {
+func (ws WeightedSniff) GetMove(board model.Board) model.Move {
+	sniffRadius = (board.Width + board.Height)/2
 	cs := sniffedCoords(board)
 	weights := make(map[model.Coord]int)
 	for _, c := range cs {
@@ -57,7 +57,7 @@ func (ws WeightedSniff) getMove(board model.Board) model.Move {
 		b := step(board, mv.mv)
 		free := moveableSquares(b)
 		fmt.Printf("Moveable after %s:%d\n", model.PossibleMoves[mv.mv], free)
-		mvs[i].weight += free*free
+		mvs[i].weight += free
 	}
 
 	return chooseMove(u.weight, d.weight, l.weight, r.weight)
@@ -76,13 +76,7 @@ func moveableSquares(b model.Board) int {
 		}
 	}
 
-	i := 0
-
 	for {
-		i++
-		if i > 5000 {
-			panic("Oh no")
-		}
 		if len(queue) == 0 {
 			break
 		}
@@ -160,24 +154,6 @@ func chooseMove(u, d, l, r int) model.Move {
 		return model.Up
 	}
 	return choices[rand.Intn(len(choices))]
-
-	//fmt.Println("To", tot)
-	//if tot == 0 {
-	//	return model.Up
-	//}
-	//choose := rand.Intn(tot) + 1
-	//fmt.Println("Ch", choose)
-	//if choose <= u {
-	//	return model.Up
-	//} else if choose <= (u + d) {
-	//	return model.Down
-	//} else if choose <= (u + d + l) {
-	//	return model.Left
-	//} else if choose <= (u + d + l + r) {
-	//	return model.Right
-	//}
-	// Ssss we die
-	return model.Up
 }
 
 func sniffedCoords(board model.Board) []model.Coord {
@@ -212,12 +188,12 @@ func weightMyCoord(board model.Board, coord model.Coord) int {
 }
 
 func foodWeight(board model.Board) int {
-	if board.Snakes[0].Health > 40 {
-		return 4
-	} else if board.Snakes[0].Health > 25 {
+	if board.Snakes[0].Health > 50 {
+		return 0
+	} else if board.Snakes[0].Health > 30 {
 		return 15
 	}
-	return 30
+	return 50
 }
 
 func snakeWeight(board model.Board, coord model.Coord) int {

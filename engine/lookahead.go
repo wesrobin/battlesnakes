@@ -16,7 +16,7 @@ type Lookahead struct {
 
 const searchDepth = 10
 
-func (la *Lookahead) getMove(board model.Board) model.Move {
+func (la *Lookahead) GetMove(board model.Board) model.Move {
 	b := board // Don't touch the original
 	return la.dfs(b)
 }
