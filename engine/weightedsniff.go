@@ -189,7 +189,7 @@ func weightMyCoord(board model.Board, coord model.Coord) int {
 
 func foodWeight(board model.Board) int {
 	if board.Snakes[0].Health > 50 {
-		return 0
+		return 2
 	} else if board.Snakes[0].Health > 30 {
 		return 15
 	}
