@@ -29,6 +29,10 @@ type Coord struct {
 	Y int `json:"y"`
 }
 
+func (c Coord) String() string {
+	return fmt.Sprintf("{%d,%d}", c.X, c.Y)
+}
+
 func (c Coord) Move(move Move) Coord {
 	switch move {
 	case Up:
@@ -75,4 +79,5 @@ var (
 	Nothing GameObject = 0
 	Snake   GameObject = 1
 	Food    GameObject = 2
+	Tail    GameObject = 3
 )

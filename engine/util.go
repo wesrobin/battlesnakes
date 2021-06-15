@@ -39,17 +39,7 @@ func inBounds(board model.Board, coord model.Coord) bool {
 }
 
 func legalCoord(board model.Board, coord model.Coord) bool {
-	if !inBounds(board, coord) {
-		return false
-	}
-
-	for i := 0; i < int(board.Snakes[0].Length) - 1; i++ { // Ignore head, neck and tail
-		if coord == board.Snakes[0].Body[i] {
-			return false
-		}
-	}
-
-	return true // If it makes it here we are ok.
+	return inBounds(board, coord) && state[coord] != model.Snake
 }
 
 // Pls only call with legal moves <3

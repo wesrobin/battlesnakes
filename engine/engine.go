@@ -10,7 +10,7 @@ var ws = WeightedSniff{}
 
 func GetMove(board model.Board) string {
 	s := board
-	updateState(board)
+	UpdateState(board)
 	printMap(s)
 	move := ws.getMove(s)
 	fmt.Println("chose", model.PossibleMoves[move])
