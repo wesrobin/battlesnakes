@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
+	"time"
 )
 
 func main() {
@@ -12,6 +14,7 @@ func main() {
 	if len(port) == 0 {
 		port = "8080"
 	}
+	rand.Seed(time.Now().Unix())
 
 	http.HandleFunc("/", HandleIndex)
 	http.HandleFunc("/start", HandleStart)

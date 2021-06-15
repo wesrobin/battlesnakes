@@ -1,15 +1,20 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/wesrobin/battlesnakes/model"
 )
 
-var la = Lookahead{} // Store some state
+var la = Lookahead{}
+var ws = WeightedSniff{}
 
-func GetMove(state model.Board) string {
-	s := state
+func GetMove(board model.Board) string {
+	s := board
+	updateState(board)
 	printMap(s)
-	move := la.getMove(s)
+	move := ws.getMove(s)
+	fmt.Println("chose", model.PossibleMoves[move])
+	fmt.Println("*******END*******")
 
 	// --- Base case ---
 	//// Choose a random direction to move in

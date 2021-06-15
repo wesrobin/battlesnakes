@@ -29,6 +29,20 @@ type Coord struct {
 	Y int `json:"y"`
 }
 
+func (c Coord) Move(move Move) Coord {
+	switch move {
+	case Up:
+		return Coord{X: c.X, Y: c.Y + 1}
+	case Down:
+		return Coord{X: c.X, Y: c.Y - 1}
+	case Left:
+		return Coord{X: c.X - 1, Y: c.Y}
+	case Right:
+		return Coord{X: c.X + 1, Y: c.Y}
+	}
+	panic("Ssss")
+}
+
 type Battlesnake struct {
 	ID     string  `json:"id"`
 	Name   string  `json:"name"`
@@ -49,8 +63,16 @@ var (
 )
 
 var PossibleMoves = map[Move]string{
-	Up:"up",
-	Down: "down",
-	Left: "left",
+	Up:    "up",
+	Down:  "down",
+	Left:  "left",
 	Right: "right",
 }
+
+type GameObject int
+
+var (
+	Nothing GameObject = 0
+	Snake   GameObject = 1
+	Food    GameObject = 2
+)

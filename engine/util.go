@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/wesrobin/battlesnakes/model"
 	"log"
+	"math"
 )
 
 func getCoordAfterMove(coord model.Coord, move model.Move) model.Coord {
@@ -20,22 +21,30 @@ func getCoordAfterMove(coord model.Coord, move model.Move) model.Coord {
 	return model.Coord{} // Hiss
 }
 
-func legalCoord(state model.Board, coord model.Coord) bool {
+func inBounds(board model.Board, coord model.Coord) bool {
 	if coord.X < 0 {
 		return false
 	}
 	if coord.Y < 0 {
 		return false
 	}
-	if coord.Y >= state.Height {
+	if coord.Y >= board.Height {
 		return false
 	}
-	if coord.X >= state.Width {
+	if coord.X >= board.Width {
 		return false
 	}
 
-	for _, part := range state.Snakes[0].Body {
-		if coord == part {
+	return true
+}
+
+func legalCoord(board model.Board, coord model.Coord) bool {
+	if !inBounds(board, coord) {
+		return false
+	}
+
+	for i := 0; i < int(board.Snakes[0].Length) - 1; i++ { // Ignore head, neck and tail
+		if coord == board.Snakes[0].Body[i] {
 			return false
 		}
 	}
@@ -130,4 +139,8 @@ func printMap(state model.Board) {
 		o.WriteString("\n")
 	}
 	log.Println(o.String())
+}
+
+func dist(a, b model.Coord) float64 {
+	return math.Sqrt(math.Pow(float64(a.X)-float64(b.X), 2) + math.Pow(float64(a.Y)-float64(b.Y), 2))
 }
