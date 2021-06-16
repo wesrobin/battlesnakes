@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"fmt"
 	"github.com/wesrobin/battlesnakes/model"
 	"math"
 	"math/rand"
@@ -55,8 +54,7 @@ func (ws WeightedSniff) GetMove(board model.Board) model.Move {
 		}
 		b := step(board, mv.mv)
 		free := moveableSquares(b)
-		fmt.Printf("Moveable after %s:%d\n", model.PossibleMoves[mv.mv], free)
-		mvs[i].weight += free
+		mvs[i].weight += free/2
 	}
 
 	return chooseMove(u.weight, d.weight, l.weight, r.weight)
@@ -192,9 +190,9 @@ func foodWeight(board model.Board) int {
 	if board.Snakes[0].Health > 50 {
 		return 2
 	} else if board.Snakes[0].Health > 30 {
-		return 15
+		return 10
 	}
-	return 50
+	return 30
 }
 
 func tailWeight(board model.Board) int {
@@ -203,7 +201,7 @@ func tailWeight(board model.Board) int {
 	} else if board.Snakes[0].Health > 30 {
 		return myTail/2
 	}
-	return 2
+	return 10
 }
 
 func isMyTail(board model.Board, coord model.Coord) bool {
