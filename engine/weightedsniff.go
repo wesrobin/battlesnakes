@@ -48,7 +48,6 @@ func (ws WeightedSniff) GetMove(board model.Board) model.Move {
 		r.weight = 0
 	}
 
-	// TODO: Bias towards turning to the side that has more space - the bigger the difference the stronger the bias
 	mvs := []*moveWeight{&u, &d, &l, &r}
 	for i, mv := range mvs {
 		if mv.weight == 0 {
@@ -181,7 +180,9 @@ func weightMyCoord(board model.Board, coord model.Coord) int {
 	if state[coord] == model.Food {
 		return foodWeight(board)
 	} else if state[coord] == model.Snake {
-		return snakeWeight(board, coord)
+		return illegal
+	} else if isMyTail(board, coord) {
+		return tailWeight(board)
 	}
 
 	return 10
@@ -196,14 +197,19 @@ func foodWeight(board model.Board) int {
 	return 50
 }
 
-func snakeWeight(board model.Board, coord model.Coord) int {
-	if isMyTail(board, coord) {
+func tailWeight(board model.Board) int {
+	if board.Snakes[0].Health > 50 {
 		return myTail
+	} else if board.Snakes[0].Health > 30 {
+		return myTail/2
 	}
-	return illegal
+	return 2
 }
 
 func isMyTail(board model.Board, coord model.Coord) bool {
+	if state[coord] != model.Tail {
+		return false
+	}
 	// At the start the tail overlaps some segments, just check that it's not doing that too pls
 	return coord == board.Snakes[0].Body[board.Snakes[0].Length-1] && coord != board.Snakes[0].Body[board.Snakes[0].Length-2]
 }

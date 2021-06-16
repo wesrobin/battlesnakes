@@ -15,7 +15,7 @@ func genState(board model.Board) map[model.Coord]model.GameObject {
 	for _, snek := range board.Snakes {
 		for i, body := range snek.Body {
 			body := body
-			if i != len(snek.Body)-1 {
+			if i < len(snek.Body)-1 {
 				state[body] = model.Snake
 			} else {
 				// When we eat an apple or on a new turn the tail can == body, and is always considered last
