@@ -60,6 +60,19 @@ func (ws WeightedSniff) GetMove(s state, board model.Board) model.Move {
 		b := step(board, mv.mv)
 		free := ws.moveableSquares(b)
 		mvs[i].weight += free / 2
+
+	}
+
+	for i, mv := range mvs {
+		// Check if adjacent to other snek head - these are bad because we don't know what they will do
+		for _, snek := range s.otherSneks {
+			if len(s.me.Body) > len(snek.Body) {
+				continue
+			}
+			if isAdjacent(ws.s.me.Head.Move(mv.mv), snek.Head) {
+				mvs[i].weight = 0
+			}
+		}
 	}
 
 	return chooseMove(u.weight, d.weight, l.weight, r.weight)
@@ -71,9 +84,9 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 	total := 0
 
 	head := b.Snakes[0].Head
-	adj := getAdjacent(head)
+	adj := adjacentCells(head)
 	for _, coord := range adj {
-		if inBounds(b, coord) {
+		if legalCoord(ws.s, b, coord) {
 			queue = append(queue, coord)
 		}
 	}
@@ -84,12 +97,12 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 		}
 		c := queue[0]
 		queue = queue[1:]
-		if ws.s.gobjs[c] == model.Body || ws.s.gobjs[c] == model.Head || !inBounds(b, c) || seen[c] {
+		if legalCoord(ws.s, b, c) || seen[c] {
 			continue
 		}
 		seen[c] = true
 		total++
-		adjs := getAdjacent(c)
+		adjs := adjacentCells(c)
 		for _, adj := range adjs {
 			if !seen[adj] {
 				queue = append(queue, adj)
@@ -100,7 +113,7 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 	return total
 }
 
-func getAdjacent(cell model.Coord) []model.Coord {
+func adjacentCells(cell model.Coord) []model.Coord {
 	return getLines(cell, 1)
 }
 
@@ -115,6 +128,14 @@ func getLines(cell model.Coord, distance int) []model.Coord {
 		)
 	}
 	return cs
+}
+
+func isAdjacent(a, b model.Coord) bool {
+	return isAdjacentWithMoves(a, b, 1)
+}
+
+func isAdjacentWithMoves(a, b model.Coord, moves int) bool {
+	return distTaxi(a, b) <= int64(moves)
 }
 
 func moveWeights(head model.Coord, weights map[model.Coord]int) (u, d, l, r moveWeight) {
@@ -190,14 +211,13 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 		return illegal
 	}
 
-	// Check if adjacent to other snek head - these are bad because we don't know what they will do
 	for _, snek := range ws.s.otherSneks {
 		if len(ws.s.me.Body) < len(snek.Body) {
 			continue
 		}
-		for _, c := range getAdjacent(snek.Head) {
+		for _, c := range adjacentCells(snek.Head) {
 			if c == coord && ws.s.gobjs[c] != model.Body {
-				return 30
+				return 50
 			}
 		}
 	}
