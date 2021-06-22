@@ -82,7 +82,7 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 		}
 		c := queue[0]
 		queue = queue[1:]
-		if ws.s.gobjs[c] == model.Body || ws.s.gobjs[c] == model.Tail || ws.s.gobjs[c] == model.Head || !inBounds(b, c) || seen[c] {
+		if ws.s.gobjs[c] == model.Body || ws.s.gobjs[c] == model.Head || !inBounds(b, c) || seen[c] {
 			continue
 		}
 		seen[c] = true
@@ -213,11 +213,11 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 
 func foodWeight(me model.Battlesnake) int {
 	if me.Health > 50 {
-		return 2
+		return 20
 	} else if me.Health > 30 {
-		return 15
-	} else if me.Health > 10 {
 		return 30
+	} else if me.Health > 10 {
+		return 50
 	}
 	return 100
 }
