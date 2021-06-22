@@ -39,7 +39,7 @@ func inBounds(board model.Board, coord model.Coord) bool {
 }
 
 func legalCoord(s state, board model.Board, coord model.Coord) bool {
-	return inBounds(board, coord) && s.gobjs[coord] != model.Snake
+	return inBounds(board, coord) && s.gobjs[coord] != model.Body
 }
 
 // Pls only call with legal moves <3

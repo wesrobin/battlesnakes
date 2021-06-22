@@ -34,7 +34,7 @@ func createState(board model.Board, me model.Battlesnake) state {
 }
 
 func UpdateState(id string, board model.Board, me model.Battlesnake) {
-	if _, ok := sm[id] ; !ok { // My client sucks, so just do this
+	if _, ok := sm[id]; !ok { // My client sucks, so just do this
 		sm[id] = createState(board, me)
 	}
 	sm[id] = updateState(sm[id], board)
@@ -58,8 +58,10 @@ func updateState(old state, board model.Board) state {
 	for _, snek := range board.Snakes {
 		for i, body := range snek.Body {
 			body := body
-			if i < len(snek.Body)-1 {
-				s.gobjs[body] = model.Snake
+			if i == 0 {
+				s.gobjs[body] = model.Head
+			} else if i < len(snek.Body)-1 {
+				s.gobjs[body] = model.Body
 			} else {
 				// When we eat an apple or on a new turn the tail can == body, and is always considered last
 				if _, ok := s.gobjs[body]; !ok {

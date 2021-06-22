@@ -77,7 +77,8 @@ type GameObject int
 
 var (
 	Nothing GameObject = 0
-	Snake   GameObject = 1
+	Body    GameObject = 1
 	Food    GameObject = 2
 	Tail    GameObject = 3
+	Head    GameObject = 4
 )

@@ -81,7 +81,7 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 		}
 		c := queue[0]
 		queue = queue[1:]
-		if ws.s.gobjs[c] == model.Snake || !inBounds(b, c) || seen[c] {
+		if ws.s.gobjs[c] == model.Body || !inBounds(b, c) || seen[c] {
 			continue
 		}
 		seen[c] = true
@@ -177,10 +177,19 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 		return illegal
 	}
 
+	// Check if adjacent to other snek head - these are bad because we don't know what they will do
+	for _, snek := range ws.s.otherSneks {
+		for _, c := range getAdjacent(snek.Head) {
+			if c == coord {
+				return illegal
+			}
+		}
+	}
+
 	// Check is food
 	if ws.s.gobjs[coord] == model.Food {
 		return foodWeight(ws.s.me, board)
-	} else if ws.s.gobjs[coord] == model.Snake {
+	} else if ws.s.gobjs[coord] == model.Body {
 		return illegal
 	} else if ws.isMyTail(board, coord) {
 		return tailWeight(ws.s.me, board)
