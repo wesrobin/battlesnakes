@@ -239,7 +239,7 @@ func foodWeight(me model.Battlesnake) int {
 	} else if me.Health > 30 {
 		return 30
 	} else if me.Health > 10 {
-		return 50
+		return 75
 	}
 	return 100
 }
