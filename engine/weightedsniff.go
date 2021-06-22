@@ -7,12 +7,14 @@ import (
 	"math/rand"
 )
 
+// Author's note: This is some of the most bad code I have written, sorry future self. Code standards would be good.
+
 type WeightedSniff struct {
 	s state
 }
 
 var (
-	myTail  = 50
+	myTail  = 15
 	illegal = 0
 
 	// Misc
@@ -235,6 +237,6 @@ func (ws WeightedSniff) isMyTail(coord model.Coord) bool {
 	if ws.s.gobjs[coord] != model.Tail {
 		return false
 	}
-	// At the start the tail overlaps some segments, just check that it'sm not doing that too pls
+	// At the start the tail overlaps some segments, just check that it's not doing that too pls
 	return coord == ws.s.me.Body[ws.s.me.Length-1] && coord != ws.s.me.Body[ws.s.me.Length-2]
 }
