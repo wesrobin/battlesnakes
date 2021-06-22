@@ -26,7 +26,7 @@ type moveWeight struct {
 
 func (ws WeightedSniff) GetMove(s state, board model.Board) model.Move {
 	ws.s = s
-	sniffRadius = (board.Width + board.Height)/2
+	sniffRadius = (board.Width + board.Height) / 2
 	cs := sniffedCoords(ws.s.me)
 	weights := make(map[model.Coord]int)
 	for _, c := range cs {
@@ -57,7 +57,7 @@ func (ws WeightedSniff) GetMove(s state, board model.Board) model.Move {
 		}
 		b := step(board, mv.mv)
 		free := ws.moveableSquares(b)
-		mvs[i].weight += free/2
+		mvs[i].weight += free / 2
 	}
 
 	return chooseMove(u.weight, d.weight, l.weight, r.weight)
@@ -82,7 +82,7 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 		}
 		c := queue[0]
 		queue = queue[1:]
-		if ws.s.gobjs[c] == model.Body || !inBounds(b, c) || seen[c] {
+		if ws.s.gobjs[c] == model.Body || ws.s.gobjs[c] == model.Tail || ws.s.gobjs[c] == model.Head || !inBounds(b, c) || seen[c] {
 			continue
 		}
 		seen[c] = true
@@ -99,12 +99,20 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 }
 
 func getAdjacent(cell model.Coord) []model.Coord {
-	return []model.Coord{
-		{X: cell.X + 1, Y: cell.Y},
-		{X: cell.X - 1, Y: cell.Y},
-		{X: cell.X, Y: cell.Y + 1},
-		{X: cell.X, Y: cell.Y - 1},
+	return getLines(cell, 1)
+}
+
+func getLines(cell model.Coord, distance int) []model.Coord {
+	var cs []model.Coord
+	for i := 1; i <= distance; i++ {
+		cs = append(cs,
+			model.Coord{X: cell.X + i, Y: cell.Y},
+			model.Coord{X: cell.X - i, Y: cell.Y},
+			model.Coord{X: cell.X, Y: cell.Y + i},
+			model.Coord{X: cell.X, Y: cell.Y - i},
+		)
 	}
+	return cs
 }
 
 func moveWeights(head model.Coord, weights map[model.Coord]int) (u, d, l, r moveWeight) {
@@ -141,19 +149,19 @@ func chooseMove(u, d, l, r int) model.Move {
 	fmt.Printf("u %d\nd %d\nl %d\nr %d", u, d, l, r)
 	max := int(math.Max(float64(u), math.Max(float64(d), math.Max(float64(l), float64(r)))))
 	choices := make([]model.Move, 0)
-	for i := 0 ; i < u && withinRange(u, max) ; i++ {
+	for i := 0; i < u && withinRange(u, max); i++ {
 		choices = append(choices, model.Up)
 	}
-	for i := 0 ; i < d && withinRange(d, max) ; i++ {
+	for i := 0; i < d && withinRange(d, max); i++ {
 		choices = append(choices, model.Down)
 	}
-	for i := 0 ; i < l && withinRange(l, max) ; i++ {
+	for i := 0; i < l && withinRange(l, max); i++ {
 		choices = append(choices, model.Left)
 	}
-	for i := 0 ; i < r && withinRange(r, max) ; i++ {
+	for i := 0; i < r && withinRange(r, max); i++ {
 		choices = append(choices, model.Right)
 	}
-	if len( choices) == 0 {
+	if len(choices) == 0 {
 		return model.Up
 	}
 	return choices[rand.Intn(len(choices))]
@@ -196,8 +204,8 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 		return foodWeight(ws.s.me)
 	} else if ws.s.gobjs[coord] == model.Body {
 		return illegal
-	} else if ws.isMyTail(board, coord) {
-		return tailWeight(ws.s.me, board)
+	} else if ws.isMyTail(coord) {
+		return tailWeight(ws.s.me)
 	}
 
 	return 10
@@ -207,23 +215,23 @@ func foodWeight(me model.Battlesnake) int {
 	if me.Health > 50 {
 		return 2
 	} else if me.Health > 30 {
-		return 10
+		return 15
 	} else if me.Health > 10 {
 		return 30
 	}
 	return 100
 }
 
-func tailWeight(me model.Battlesnake, board model.Board) int {
+func tailWeight(me model.Battlesnake) int {
 	if me.Health > 50 {
 		return myTail
 	} else if me.Health > 30 {
-		return myTail/2
+		return myTail / 2
 	}
-	return 10
+	return 2
 }
 
-func (ws WeightedSniff) isMyTail(board model.Board, coord model.Coord) bool {
+func (ws WeightedSniff) isMyTail(coord model.Coord) bool {
 	if ws.s.gobjs[coord] != model.Tail {
 		return false
 	}
