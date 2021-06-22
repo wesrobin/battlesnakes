@@ -39,6 +39,18 @@ func inBounds(board model.Board, coord model.Coord) bool {
 }
 
 func legalCoord(s state, board model.Board, coord model.Coord) bool {
+	// Check if adjacent to other snek head - these are bad because we don't know what they will do
+	for _, snek := range s.otherSneks {
+		if len(s.me.Body) > len(snek.Body) {
+			continue
+		}
+		for _, c := range getAdjacent(snek.Head) {
+			if c == coord {
+				return false
+			}
+		}
+	}
+
 	return inBounds(board, coord) && s.gobjs[coord] != model.Body
 }
 

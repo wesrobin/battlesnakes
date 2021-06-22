@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"fmt"
 	"github.com/wesrobin/battlesnakes/model"
 	"math"
 	"math/rand"
@@ -131,11 +132,13 @@ func moveWeights(head model.Coord, weights map[model.Coord]int) (u, d, l, r move
 	return
 }
 
+// Ensure that the given val is within 10% of the given max
 func withinRange(val, max int) bool {
 	return float32(max-val)/float32(max) < 0.1
 }
 
 func chooseMove(u, d, l, r int) model.Move {
+	fmt.Printf("u %d\nd %d\nl %d\nr %d", u, d, l, r)
 	max := int(math.Max(float64(u), math.Max(float64(d), math.Max(float64(l), float64(r)))))
 	choices := make([]model.Move, 0)
 	for i := 0 ; i < u && withinRange(u, max) ; i++ {
@@ -179,16 +182,18 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 
 	// Check if adjacent to other snek head - these are bad because we don't know what they will do
 	for _, snek := range ws.s.otherSneks {
+		if len(ws.s.me.Body) < len(snek.Body) {
+			continue
+		}
 		for _, c := range getAdjacent(snek.Head) {
-			if c == coord {
-				return illegal
+			if c == coord && ws.s.gobjs[c] != model.Body {
+				return 30
 			}
 		}
 	}
 
-	// Check is food
 	if ws.s.gobjs[coord] == model.Food {
-		return foodWeight(ws.s.me, board)
+		return foodWeight(ws.s.me)
 	} else if ws.s.gobjs[coord] == model.Body {
 		return illegal
 	} else if ws.isMyTail(board, coord) {
@@ -198,13 +203,15 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 	return 10
 }
 
-func foodWeight(me model.Battlesnake, board model.Board) int {
+func foodWeight(me model.Battlesnake) int {
 	if me.Health > 50 {
 		return 2
 	} else if me.Health > 30 {
 		return 10
+	} else if me.Health > 10 {
+		return 30
 	}
-	return 30
+	return 100
 }
 
 func tailWeight(me model.Battlesnake, board model.Board) int {
