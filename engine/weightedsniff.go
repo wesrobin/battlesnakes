@@ -7,6 +7,7 @@ import (
 )
 
 type WeightedSniff struct {
+	s state
 }
 
 var (
@@ -22,28 +23,29 @@ type moveWeight struct {
 	weight int
 }
 
-func (ws WeightedSniff) GetMove(board model.Board) model.Move {
+func (ws WeightedSniff) GetMove(s state, board model.Board) model.Move {
+	ws.s = s
 	sniffRadius = (board.Width + board.Height)/2
-	cs := sniffedCoords(board)
+	cs := sniffedCoords(ws.s.me)
 	weights := make(map[model.Coord]int)
 	for _, c := range cs {
-		w := weightMyCoord(board, c)
+		w := ws.weightMyCoord(board, c)
 		weights[c] = w
 	}
-	u, d, l, r := moveWeights(board.Snakes[0].Head, weights)
+	u, d, l, r := moveWeights(ws.s.me.Head, weights)
 
 	// Don't do illegal stuff
-	head := board.Snakes[0].Head
-	if !legalCoord(board, head.Move(model.Up)) {
+	head := ws.s.me.Head
+	if !legalCoord(ws.s, board, head.Move(model.Up)) {
 		u.weight = 0
 	}
-	if !legalCoord(board, head.Move(model.Down)) {
+	if !legalCoord(ws.s, board, head.Move(model.Down)) {
 		d.weight = 0
 	}
-	if !legalCoord(board, head.Move(model.Left)) {
+	if !legalCoord(ws.s, board, head.Move(model.Left)) {
 		l.weight = 0
 	}
-	if !legalCoord(board, head.Move(model.Right)) {
+	if !legalCoord(ws.s, board, head.Move(model.Right)) {
 		r.weight = 0
 	}
 
@@ -53,14 +55,14 @@ func (ws WeightedSniff) GetMove(board model.Board) model.Move {
 			continue
 		}
 		b := step(board, mv.mv)
-		free := moveableSquares(b)
+		free := ws.moveableSquares(b)
 		mvs[i].weight += free/2
 	}
 
 	return chooseMove(u.weight, d.weight, l.weight, r.weight)
 }
 
-func moveableSquares(b model.Board) int {
+func (ws WeightedSniff) moveableSquares(b model.Board) int {
 	seen := make(map[model.Coord]bool)
 	queue := make([]model.Coord, 0)
 	total := 0
@@ -79,7 +81,7 @@ func moveableSquares(b model.Board) int {
 		}
 		c := queue[0]
 		queue = queue[1:]
-		if state[c] == model.Snake || !inBounds(b, c) || seen[c] {
+		if ws.s.gobjs[c] == model.Snake || !inBounds(b, c) || seen[c] {
 			continue
 		}
 		seen[c] = true
@@ -110,8 +112,9 @@ func moveWeights(head model.Coord, weights map[model.Coord]int) (u, d, l, r move
 	l = moveWeight{mv: model.Left}
 	r = moveWeight{mv: model.Right}
 	for c, w := range weights {
-		dist := dist(head, c)
-		dist = math.Pow(dist, 2) // Inverse square to the distance
+		//dist := float64(dist(head, c))
+		//dist = math.Pow(dist, 2)
+		dist := float64(distTaxi(head, c))
 		if c.X > head.X {
 			r.weight += int(float64(w) / dist)
 		}
@@ -153,9 +156,9 @@ func chooseMove(u, d, l, r int) model.Move {
 	return choices[rand.Intn(len(choices))]
 }
 
-func sniffedCoords(board model.Board) []model.Coord {
-	head := board.Snakes[0].Head
-	neck := board.Snakes[0].Body[1]
+func sniffedCoords(me model.Battlesnake) []model.Coord {
+	head := me.Head
+	neck := me.Body[1]
 	var sniffs []model.Coord
 	for x := head.X - sniffRadius; x <= head.X+sniffRadius; x++ {
 		for y := head.Y - sniffRadius; y <= head.Y+sniffRadius; y++ {
@@ -169,45 +172,45 @@ func sniffedCoords(board model.Board) []model.Coord {
 	return sniffs
 }
 
-func weightMyCoord(board model.Board, coord model.Coord) int {
+func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int {
 	if !inBounds(board, coord) {
 		return illegal
 	}
 
 	// Check is food
-	if state[coord] == model.Food {
-		return foodWeight(board)
-	} else if state[coord] == model.Snake {
+	if ws.s.gobjs[coord] == model.Food {
+		return foodWeight(ws.s.me, board)
+	} else if ws.s.gobjs[coord] == model.Snake {
 		return illegal
-	} else if isMyTail(board, coord) {
-		return tailWeight(board)
+	} else if ws.isMyTail(board, coord) {
+		return tailWeight(ws.s.me, board)
 	}
 
 	return 10
 }
 
-func foodWeight(board model.Board) int {
-	if board.Snakes[0].Health > 50 {
+func foodWeight(me model.Battlesnake, board model.Board) int {
+	if me.Health > 50 {
 		return 2
-	} else if board.Snakes[0].Health > 30 {
+	} else if me.Health > 30 {
 		return 10
 	}
 	return 30
 }
 
-func tailWeight(board model.Board) int {
-	if board.Snakes[0].Health > 50 {
+func tailWeight(me model.Battlesnake, board model.Board) int {
+	if me.Health > 50 {
 		return myTail
-	} else if board.Snakes[0].Health > 30 {
+	} else if me.Health > 30 {
 		return myTail/2
 	}
 	return 10
 }
 
-func isMyTail(board model.Board, coord model.Coord) bool {
-	if state[coord] != model.Tail {
+func (ws WeightedSniff) isMyTail(board model.Board, coord model.Coord) bool {
+	if ws.s.gobjs[coord] != model.Tail {
 		return false
 	}
-	// At the start the tail overlaps some segments, just check that it's not doing that too pls
-	return coord == board.Snakes[0].Body[board.Snakes[0].Length-1] && coord != board.Snakes[0].Body[board.Snakes[0].Length-2]
+	// At the start the tail overlaps some segments, just check that it'sm not doing that too pls
+	return coord == ws.s.me.Body[ws.s.me.Length-1] && coord != ws.s.me.Body[ws.s.me.Length-2]
 }

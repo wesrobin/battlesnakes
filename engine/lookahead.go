@@ -12,6 +12,7 @@ import (
 
 type Lookahead struct {
 	cache sync.Map
+	s state
 }
 
 const searchDepth = 10
@@ -24,7 +25,7 @@ func (la *Lookahead) GetMove(board model.Board) model.Move {
 
 // Returns a list of possible moves after iterating `searchDepth` times
 func (la *Lookahead) dfs(board model.Board) model.Move {
-	possMvs := getPossibleMoves(board)
+	possMvs := getPossibleMoves(la.s, board)
 	moveScores := make(map[model.Move]int)
 	for _, mv := range possMvs {
 		board := board
@@ -64,7 +65,7 @@ func (la *Lookahead) dfsUtil(board *model.Board, mv model.Move, d int) int {
 	if b.Snakes[0].Health == 0 {
 		return d
 	}
-	mvs := getPossibleMoves(b)
+	mvs := getPossibleMoves(la.s, b)
 	if len(mvs) == 0 {
 		return d
 	}

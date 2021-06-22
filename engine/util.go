@@ -38,8 +38,8 @@ func inBounds(board model.Board, coord model.Coord) bool {
 	return true
 }
 
-func legalCoord(board model.Board, coord model.Coord) bool {
-	return inBounds(board, coord) && state[coord] != model.Snake
+func legalCoord(s state, board model.Board, coord model.Coord) bool {
+	return inBounds(board, coord) && s.gobjs[coord] != model.Snake
 }
 
 // Pls only call with legal moves <3
@@ -87,11 +87,11 @@ func deepCopy(board model.Board) model.Board {
 	return b
 }
 
-func getPossibleMoves(board model.Board) []model.Move {
+func getPossibleMoves(s state, board model.Board) []model.Move {
 	var pMvs []model.Move
 	for mv := range model.PossibleMoves {
 		coord := getCoordAfterMove(board.Snakes[0].Head, mv)
-		if legalCoord(board, coord) {
+		if legalCoord(s, board, coord) {
 			pMvs = append(pMvs, mv)
 		}
 	}
@@ -132,5 +132,10 @@ func printMap(state model.Board) {
 }
 
 func dist(a, b model.Coord) float64 {
-	return math.Sqrt(math.Pow(float64(a.X)-float64(b.X), 2) + math.Pow(float64(a.Y)-float64(b.Y), 2))
+	return math.Sqrt(math.Pow(float64(a.X-b.X), 2) + math.Pow(float64(a.Y-b.Y), 2))
+}
+
+// distTaxi calculates distance using https://en.wikipedia.org/wiki/Taxicab_geometry
+func distTaxi(a, b model.Coord) int64 {
+	return int64(math.Abs(float64(a.X-b.X)) + math.Abs(float64(a.Y-b.Y)))
 }
