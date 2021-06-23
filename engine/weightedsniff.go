@@ -97,7 +97,7 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 		}
 		c := queue[0]
 		queue = queue[1:]
-		if legalCoord(ws.s, b, c) || seen[c] {
+		if legalCoord(ws.s, b, c) || seen[c] || closeToEnemyHead(c, ws.s) {
 			continue
 		}
 		seen[c] = true
@@ -111,6 +111,16 @@ func (ws WeightedSniff) moveableSquares(b model.Board) int {
 	}
 
 	return total
+}
+
+func closeToEnemyHead(c model.Coord, s state) bool {
+	dist := 2
+	for _, snek := range s.otherSneks {
+		if isAdjacentWithMoves(c, snek.Head, dist) {
+			return true
+		}
+	}
+	return false
 }
 
 func adjacentCells(cell model.Coord) []model.Coord {
@@ -234,12 +244,12 @@ func (ws WeightedSniff) weightMyCoord(board model.Board, coord model.Coord) int 
 }
 
 func foodWeight(me model.Battlesnake) int {
-	if me.Health > 50 {
+	if me.Health > 80 {
 		return 20
-	} else if me.Health > 30 {
+	} else if me.Health > 50 {
 		return 30
-	} else if me.Health > 10 {
-		return 75
+	} else if me.Health > 30 {
+		return 50
 	}
 	return 100
 }
